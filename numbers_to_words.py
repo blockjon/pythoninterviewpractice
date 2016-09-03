@@ -170,7 +170,7 @@ def get_tens_result(number):
     # Ensure we are dealing with numbers below 100
     number %= 100
     if number == 0:
-        return ''
+        return None
     if number > 19:
         result = TENS_NAMES[int(math.floor(number / 10))]
         single_digit_name = digit_to_word(number % 10)
@@ -181,23 +181,22 @@ def get_tens_result(number):
         return digit_to_word(number)
 
 
-def add_to_answer(three_digit_sequence, solution, position):
+def add_to_answer(three_digit_sequence, solution, group_index):
     """ Prepend the current answer with more language. """
     if three_digit_sequence / 100 >= 1:
         hundreds_digit = int(math.floor(three_digit_sequence/100))
-        described = digit_to_word(hundreds_digit)
-        result = described + " hundred"
-        tens_result = get_tens_result(three_digit_sequence)
-        if tens_result:
-            result = "{} and {}".format(result, tens_result)
+        result = digit_to_word(hundreds_digit) + " hundred"
+        sub_100_result = get_tens_result(three_digit_sequence)
+        if sub_100_result:
+            result = "{} and {}".format(result, sub_100_result)
     elif three_digit_sequence > 19:
         result = get_tens_result(three_digit_sequence)
     else:
         result = digit_to_word(three_digit_sequence)
-    if position > 0:
-        if len(GROUP_NAMES)-1 > position:
-            raise Exception("Number too large")
-        group_name = GROUP_NAMES[position]
+    if group_index > 0:
+        if len(GROUP_NAMES)-1 > group_index:
+            raise Exception("Unsupported number - number out of range")
+        group_name = GROUP_NAMES[group_index]
         result = result + " " + group_name + " "
     return result + solution
 
@@ -205,12 +204,13 @@ def add_to_answer(three_digit_sequence, solution, position):
 def say_number(input):
     """ Convert an integer into an english language phrase. """
     is_positive = input > -1
+    # Normalize.
     input = abs(input)
-    solution = ''
-    loop_counter = 0
     if input == 0:
         solution = 'zero'
     else:
+        solution = ''
+        loop_counter = 0
         while input > 0:
             three_digit_group = int(input % 1000)
             input = math.floor(input / 1000)
