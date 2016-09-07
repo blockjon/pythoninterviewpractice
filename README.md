@@ -1,3 +1,3 @@
 # Python Interview Practice Problems
 
-numbers_to_words.py - Convert integers to english words
+I occasionally create new entries in this repo when practicing data structures & algorithims.
